@@ -1,0 +1,31 @@
+IndexIgnore .htaccess */.??* *~ *# */HEADER* */README* */_vti*
+
+<IfModule mod_php4.c>
+php_flag session.use_trans_sid off
+</IfModule>
+
+RewriteEngine on
+RewriteBase /
+
+# Allows "real" directories and files to work
+# Redirect http://greedyme.com to http://www.greedyme.com
+RewriteCond %{HTTP_HOST} !^www\.inspectd\.com [NC]
+RewriteRule ^(.*) http://www.inspectd.com/$1 [L,R=301]
+
+# Cannot match . or / because then I can't tell
+# a username from a filename or directory
+RewriteRule ^members/([a-zA-Z0-9_\ \-]+)$ members/index.php?member=$1
+
+# Redirect /members/abc/ to /members/index.php?member=abc
+RewriteRule ^members/([a-zA-Z0-9_\ \-]+)/$ members/index.php?member=$1
+
+# Redirect /members/abc/test.php to /members/test.php?member=abc
+# Keep querystring vars
+RewriteRule ^members/([a-zA-Z0-9_\ \-]+)/(.*).php$ members/$2\.php?member=$1&%{QUERY_STRING}
+
+# Redirect /members/11/test to /members/test.php?member=11
+# Keep querystring vars
+RewriteRule ^members/([a-zA-Z0-9_\ \-]+)/([^\.]+)$ members/$2\.php?member=$1&%{QUERY_STRING}
+
+# Point to custom 404 error page
+ErrorDocument 404 http://www.inspectd.com/apperror.php
